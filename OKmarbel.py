@@ -32,11 +32,13 @@ frame.pack()
 Radiovar = IntVar()
 var = StringVar()
 var_analyze = IntVar()
+var_message = IntVar()
 img_ex = PhotoImage(file='../icon/예시.png')
 img_help = PhotoImage(file='../icon/사용법.png')
 img_okbg = PhotoImage(file='../icon/옥구슬 배경.png')
 img_onemore = PhotoImage(file='../icon/onemore.png')
 img_explain = PhotoImage(file='../icon/해설화면.png')
+img_explain2 = PhotoImage(file='../icon/해설화면2.png')
 img_100 = PhotoImage(file='../icon/당신은 사투리 고수.png')
 img_90 = PhotoImage(file='../icon/만점을 향하여.png')
 img_80 = PhotoImage(file='../icon/좀 더 분발해볼까.png')
@@ -50,7 +52,8 @@ img_heart1 = PhotoImage(file='../icon/목숨.png')
 img_heart2 = PhotoImage(file='../icon/목숨.png')
 img_heart3 = PhotoImage(file='../icon/목숨.png')
 img_gamebg = PhotoImage(file='../icon/게임화면.png')
-img_start = PhotoImage(file='../icon/게임시작.png')
+img_std_start = PhotoImage(file='../icon/게임시작 표준어.png')
+img_dia_start = PhotoImage(file='../icon/게임시작 사투리.png')
 img_game = PhotoImage(file='../icon/게임배경.png')
 img_logo = PhotoImage(file='../icon/로고.png')  # 로고 옥구슬
 img_std = PhotoImage(file='../icon/표준어to사투리.png')
@@ -62,8 +65,8 @@ img_translate = PhotoImage(file='../icon/변환하기.png')
 
 global top
 global game_win, start_win, final_win, explain_win
-global dia_some
-global que_label, definition_label
+global dia_some, type_check
+global que_label, definition_message
 global answers1, answers2, answers3, answers4, answers5
 global answers6, answers7, answers8, answers9
 global count, check_logo, heart_image3, heart_image2, heart_image1
@@ -359,6 +362,7 @@ def total_score():  # 퀴즈 7문제 점수 계산
 
 def explain():  # 퀴즈 해설
     global final_win, explain_win
+    global type_check
     final_win.destroy()
     explain_win = Toplevel(root)
     explain_win.geometry("820x580+200+150")
@@ -367,8 +371,12 @@ def explain():  # 퀴즈 해설
     explain_win.option_add("*Font", "굴림 15")
 
     explain_win.configure(background='white')
-    explain_image = Label(explain_win, image=img_explain)
-    explain_image.pack()
+    if type_check == 0:
+        explain_image = Label(explain_win, image=img_explain)
+        explain_image.pack()
+    else:
+        explain_image = Label(explain_win, image=img_explain2)
+        explain_image.pack()
 
     onemore_button = Button(explain_win, image=img_onemore, highlightthickness=0,
                             relief='flat', bd=0, command=onemoretime)
@@ -427,7 +435,7 @@ def final_score():  # 점수 화면 창에 뜰 최종 점수
 def timer():  # 퀴즈 타이머
     global quiz_time, label_time
     global check_logo
-    global count
+    global count, definition_message
     global start_win
     label_time = Label(start_win, text=quiz_time, bg='white')
     start_win.option_add("*Font", "굴림 20")
@@ -440,7 +448,7 @@ def timer():  # 퀴즈 타이머
         label_score.destroy()
         total_score()
         label_time.destroy()
-        definition_label.destroy()
+        definition_message.destroy()
         ans_ent.delete('0', END)
         que_label.configure(text='')
         answers1.configure(text='')
@@ -467,7 +475,12 @@ def timer():  # 퀴즈 타이머
         else:
             heart_image3.destroy()
             gameover()
-        new_problem()
+
+        if type_check == 0:
+            std_new_problem()
+        else:
+            dia_new_problem()
+
         if count == 8:
             start_win.destroy()
             final_score()
@@ -487,21 +500,23 @@ def gameover():  # 게임오버 화면
     gameover_image.pack()
     retry_bu = Button(final_win, image=img_regame, command=retry, relief='flat', bd=0, highlightthickness=0)
     retry_bu.pack()
-    retry_bu.place(x=412, y=355)
+    retry_bu.place(x=450, y=370)
     solution_bu = Button(final_win, image=img_sol, command=explain, relief='flat', bd=0, highlightthickness=0)
     solution_bu.pack()
-    solution_bu.place(x=140, y=355)
+    solution_bu.place(x=90, y=370)
 
 
-def new_problem():  # 퀴즈 보기 9문제 랜덤
+def std_new_problem():  # 퀴즈 보기 9문제 랜덤
     global dia_some
-    global que_label, definition_label
+    global que_label, definition_message
     global answers1, answers2, answers3, answers4, answers5
     global answers6, answers7, answers8, answers9
     global dia_some
     global quiz_time
-    global count
+    global count, type_check
     start_win.option_add("*Font", "굴림 20")
+
+    type_check = 0
 
     answers1 = Label(start_win, text='', bg='white')
     answers1.pack()
@@ -554,9 +569,84 @@ def new_problem():  # 퀴즈 보기 9문제 랜덤
     que_label.pack()
     que_label.place(x=137, y=385)
     start_win.option_add("*Font", "굴림 13")
-    definition_label = Label(start_win, text=dia_some[0] + ' : ' + dia_some[11], bg='white')
-    definition_label.pack()
-    definition_label.place(x=144, y=417)
+
+    definition_message = Message(start_win, textvariable=var_message, bg='white', relief='flat', width=650)
+    var_message.set(dia_some[0] + ' : ' + dia_some[11])
+    definition_message.pack()
+    definition_message.place(x=144, y=417)
+
+    start_win.option_add("*Font", "굴림 20")
+    quiz_time = 20
+    timer()
+
+
+def dia_new_problem():  # 퀴즈 보기 9문제 랜덤
+    global dia_some
+    global que_label, definition_message
+    global answers1, answers2, answers3, answers4, answers5
+    global answers6, answers7, answers8, answers9
+    global dia_some
+    global quiz_time
+    global count, type_check
+    start_win.option_add("*Font", "굴림 20")
+
+    type_check = 1
+
+    answers1 = Label(start_win, text='', bg='white')
+    answers1.pack()
+    answers2 = Label(start_win, text='', bg='white')
+    answers2.pack()
+    answers3 = Label(start_win, text='', bg='white')
+    answers3.pack()
+    answers4 = Label(start_win, text='', bg='white')
+    answers4.pack()
+    answers5 = Label(start_win, text='', bg='white')
+    answers5.pack()
+    answers6 = Label(start_win, text='', bg='white')
+    answers6.pack()
+    answers7 = Label(start_win, text='', bg='white')
+    answers7.pack()
+    answers8 = Label(start_win, text='', bg='white')
+    answers8.pack()
+    answers9 = Label(start_win, text='', bg='white')
+    answers9.pack()
+
+    dia_some = word_game_dia()
+    num = swap()
+    label_explain[count - 1][0] = dia_some[0]
+    label_explain[count - 1][1] = dia_some[1] + '(' + local_list[int(dia_some[10]) - 4] + ')'
+
+    answers1.configure(text=dia_some[num[0]])
+    answers1.place(x=60, y=135)
+    answers2.configure(text=dia_some[num[1]])
+    answers2.place(x=300, y=135)
+    answers3.configure(text=dia_some[num[2]])
+    answers3.place(x=542, y=135)
+    answers4.configure(text=dia_some[num[3]])
+    answers4.place(x=60, y=217)
+    answers5.configure(text=dia_some[num[4]])
+    answers5.place(x=300, y=217)
+    answers6.configure(text=dia_some[num[5]])
+    answers6.place(x=542, y=217)
+    answers7.configure(text=dia_some[num[6]])
+    answers7.place(x=60, y=298)
+    answers8.configure(text=dia_some[num[7]])
+    answers8.place(x=300, y=298)
+    answers9.configure(text=dia_some[num[8]])
+    answers9.place(x=542, y=298)
+
+    current_problem = Label(start_win, text=count, bg='white')
+    current_problem.pack()
+    current_problem.place(x=65, y=35)
+
+    que_label = Label(start_win, text='\"' + dia_some[0] + '\"' + '의 표준어로 옳은 것은?', bg='white')
+    que_label.pack()
+    que_label.place(x=137, y=385)
+    start_win.option_add("*Font", "굴림 13")
+    definition_message = Message(start_win, textvariable=var_message, bg='white', relief='flat', width=650)
+    var_message.set(dia_some[0] + ' : ' + dia_some[11])
+    definition_message.pack()
+    definition_message.place(x=144, y=417)
 
     start_win.option_add("*Font", "굴림 20")
     quiz_time = 20
@@ -564,7 +654,7 @@ def new_problem():  # 퀴즈 보기 9문제 랜덤
 
 
 def check_ans(event):  # 엔터 눌렀을때 정답인지 오답인지
-    global count
+    global count, type_check, definition_message
     global check_logo
     global start_win
     if dia_some[1] == ans_ent.get():
@@ -587,8 +677,12 @@ def check_ans(event):  # 엔터 눌렀을때 정답인지 오답인지
         label_score.destroy()
         total_score()
         label_time.destroy()
-        definition_label.destroy()
-        new_problem()
+        definition_message.destroy()
+        if type_check == 0:
+            std_new_problem()
+        else:
+            dia_new_problem()
+
         if count == 8:
             start_win.destroy()
             final_score()
@@ -609,7 +703,7 @@ def check_ans(event):  # 엔터 눌렀을때 정답인지 오답인지
             gameover()
 
 
-def start():  # 게임 시작 화면
+def std_start():  # 게임 시작 화면
     global start_win
     global ans_ent, check_logo
     global count
@@ -647,7 +741,53 @@ def start():  # 게임 시작 화면
     label_score.pack()
     label_score.place(x=710, y=37)
 
-    new_problem()
+    std_new_problem()
+
+    ans_ent = Entry(start_win, width=10)
+    ans_ent.bind("<Return>", check_ans)
+    ans_ent.pack()
+    ans_ent.place(x=135, y=512)
+
+
+def dia_start():  # 게임 시작 화면
+    global start_win
+    global ans_ent, check_logo
+    global count
+    global heart_image3, heart_image2, heart_image1
+    global quiz_score, label_score
+    global label_explain
+
+    label_explain = [['' for col in range(2)] for row in range(8)]
+    check_logo = 3
+    count = 1
+    game_win.destroy()
+    start_win = Toplevel(root)
+    start_win.option_add("*Font", "굴림 20")
+    start_win.geometry("820x580+200+150")
+    start_win.resizable(False, False)
+    start_win.title("낱말게임")
+    game_background = Label(start_win, image=img_gamebg)
+    game_background.pack()
+    heart_image1 = Label(start_win, image=img_heart1, highlightthickness=0, relief='flat', bd=0, bg='white')
+    heart_image1.pack()
+    heart_image1.place(x=420, y=11)
+    heart_image2 = Label(start_win, image=img_heart2, highlightthickness=0, relief='flat', bd=0, bg='white')
+    heart_image2.pack()
+    heart_image2.place(x=490, y=11)
+    heart_image3 = Label(start_win, image=img_heart3, highlightthickness=0, relief='flat', bd=0, bg='white')
+    heart_image3.pack()
+    heart_image3.place(x=560, y=11)
+
+    whole_problem = Label(start_win, text='7', bg='white')
+    whole_problem.pack()
+    whole_problem.place(x=129, y=35)
+
+    quiz_score = 0
+    label_score = Label(start_win, text=quiz_score, bg='white')
+    label_score.pack()
+    label_score.place(x=710, y=37)
+
+    dia_new_problem()
 
     ans_ent = Entry(start_win, width=10)
     ans_ent.bind("<Return>", check_ans)
@@ -670,9 +810,13 @@ def game():  # 게임 화면
     game_win.configure(background='white')
     game_image = Label(game_win, image=img_game)
     game_image.pack()
-    start_button = Button(game_win, image=img_start, command=start, relief='flat', bd=0, highlightthickness=0)
-    start_button.pack()
-    start_button.place(x=257, y=410)
+    stds_button = Button(game_win, image=img_std_start, command=std_start, relief='flat', bd=0, highlightthickness=0)
+    stds_button.pack()
+    stds_button.place(x=90, y=430)
+
+    dias_button = Button(game_win, image=img_dia_start, command=dia_start, relief='flat', bd=0, highlightthickness=0)
+    dias_button.pack()
+    dias_button.place(x=455, y=430)
 
 
 ok_background = Label(root, image=img_okbg)
@@ -739,7 +883,7 @@ root.config(me=me)
 if __name__ == '__main__':
     t = Process(target=multi_process)
     t.start()
-    from utagger_use import std_to_dia, dia_to_std, word_game
+    from utagger_use import std_to_dia, dia_to_std, word_game, word_game_dia
 
     t.kill()
     root.mainloop()

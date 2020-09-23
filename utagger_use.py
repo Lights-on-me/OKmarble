@@ -15,8 +15,9 @@ Js = [['은', '는'], ['이', '가'], ['을', '를'], ['과', '와'], ['아', '�
       ['으로서', '로서'], ['으로써', '로써'], ['으로부터', '로부터'], ['나', '이나']]
 print("프로그램 시작")
 print('txt opening...')
-df = pd.read_csv(os.path.abspath('../workbook/표준어사투리_뜻풀이.ver.txt'), sep="\t")  # 표준어 -> 사투리 엑셀파일 load
+df = pd.read_csv(os.path.abspath('../workbook/표준어_사투리.txt'), sep="\t")  # 표준어 -> 사투리 엑셀파일 load
 dt = [pd.read_csv(file[col], sep="\t") for col in range(18)]  # 사투리 -> 표준어 지역별 엑셀파일 load dt[0]=강원 dt[1]=경기...
+dq = pd.read_csv(os.path.abspath('../workbook/사투리_표준어.txt'), sep="\t")
 print('txt open ok')
 
 rt = UTagger.Load_global('..\\bin\\UTaggerR64.dll', '..\\Hlxcfg.txt')
@@ -46,19 +47,58 @@ def df_prime(q):  # 표준어에서 랜덤한 사투리 뽑기
             return df.values[q][j].split(',')[0], j
 
 
-def word_game():  # 게임문제 만들기
+def word_game():  # 게임문제 만들기 제시어:표준어
     words = [0 for col in range(0, 12)]
+    check = []
     while 1:
-        i = randint(0, len(df))
+        i = randint(0, len(df)-1)
         if df.values[i][22] != '미존재 뜻풀이':
             break
 
     words[0] = df.values[i][0]
     words[11] = df.values[i][22]
     words[1], words[10] = df_prime(i)
-    for t in range(2, 10):
-        i = randint(0, len(df))
-        words[t] = df_dia(i)
+    check.append(i)
+    N = 2
+    while N < 10:
+        i = randint(0, len(df) - 1)
+        tmp = 0
+        for p in range(0, len(check)):
+            if i == check[p]:
+                N -= 1
+                tmp = 1
+                break
+        if tmp == 0:
+            check.append(i)
+            words[N] = df_dia(i)
+            N += 1
+    return words
+
+
+def word_game_dia():
+    words = [0 for col in range(0, 12)]
+    check = []
+    i = randint(0, len(dq)-1)
+    check.append(i)
+    words[0] = dq.values[i][0]  # 제시어 사투리
+    words[1] = dq.values[i][4]   # 정답 표준어
+    words[10] = dq.values[i][5].split(',')[0]  # 지역번호
+    words[11] = dq.values[i][6]  # 사투리의 뜻풀이
+
+    N = 2
+    while N < 10:
+        i = randint(0, len(dq) - 1)
+        tmp = 0
+        for p in range(0, len(check)):
+            if i == check[p]:
+                N -= 1
+                tmp = 1
+                break
+        if tmp == 0:
+            check.append(i)
+            words[N] = dq.values[i][4]
+            N += 1
+
     return words
 
 
