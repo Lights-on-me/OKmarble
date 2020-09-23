@@ -565,7 +565,7 @@ def std_new_problem():  # 퀴즈 보기 9문제 랜덤
     current_problem.pack()
     current_problem.place(x=65, y=35)
 
-    que_label = Label(start_win, text='\"' + dia_some[0] + '\"' + '의 사투리로 옳은 것은?', bg='white')
+    que_label = Label(start_win, text='\"' + dia_some[0] + '\"' + '의 사투리로 알맞은 것은?', bg='white')
     que_label.pack()
     que_label.place(x=137, y=385)
     start_win.option_add("*Font", "굴림 13")
@@ -639,7 +639,7 @@ def dia_new_problem():  # 퀴즈 보기 9문제 랜덤
     current_problem.pack()
     current_problem.place(x=65, y=35)
 
-    que_label = Label(start_win, text='\"' + dia_some[0] + '\"' + '의 표준어로 옳은 것은?', bg='white')
+    que_label = Label(start_win, text='\"' + dia_some[0] + '\"' + '의 표준어로 알맞은 것은?', bg='white')
     que_label.pack()
     que_label.place(x=137, y=385)
     start_win.option_add("*Font", "굴림 13")
